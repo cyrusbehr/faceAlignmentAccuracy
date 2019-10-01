@@ -72,25 +72,6 @@ T getLargest(const std::vector<T>& tVec, std::function<int(T)> getArea) {
 }
 
 int main() {
-    // Set the reference landmark locations
-#ifdef TF_DLIB
-//    FileWriter writer("DLIB_accuracy");
-//    writer.write("time, angle, tx, ty, scale");
-    std::vector<cv::Point2f> coord5points = {{79.8561, 51.75}, {65.6543, 52.5136}, {30.3598, 51.9508}, {44.4134, 52.6071}, {54.8819, 79.7481}};
-#endif
-
-#ifdef TF_MTCNN_CPP_ORIGINAL
-//    FileWriter writer("MTCNN_CPP_ORIGINAL_accuracy");
-//    writer.write("time, angle, tx, ty, scale");
-    std::vector<cv::Point2f> coord5points = {{38.2946, 51.6963}, {73.5318, 51.5014}, {56.0252, 71.7366}, {41.5493, 92.3655}, {70.7299, 92.2041}};
-#endif
-
-#ifdef TF_MTCNN_CPP_NEW
-//    FileWriter writer("MTCNN_CPP_NEW_accuracy");
-//    writer.write("time, angle, tx, ty, scale");
-    std::vector<cv::Point2f> coord5points = {{38.2946, 51.6963}, {73.5318, 51.5014}, {56.0252, 71.7366}, {41.5493, 92.3655}, {70.7299, 92.2041}};
-#endif
-
     // Select the data we want to use
 //    const std::string dataPath = "/home/nchafni/Cyrus/python/readRecFile/data"; // Aligned
     const std::string dataPath = "/home/nchafni/Cyrus/data/facescrub_aligned"; // Megaface
