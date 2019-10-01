@@ -131,7 +131,7 @@ int main() {
     MTCNN mtcnn;
 #endif
 
-    const size_t numIts = 500;
+    const size_t numIts = 1000;
     size_t numImgProcessed = 0;
     size_t numFaceFound = 0;
     double totalTime = 0;
