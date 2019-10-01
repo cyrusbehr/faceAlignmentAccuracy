@@ -239,16 +239,8 @@ int main() {
         totalDy1 += std::abs(static_cast<double>(j["landmarks"]["0"]["y"]) - landmarkVec[1].y);
         totalDy2 += std::abs(static_cast<double>(j["landmarks"]["1"]["y"]) - landmarkVec[0].y);
         totalDy3 += std::abs(static_cast<double>(j["landmarks"]["2"]["y"]) - landmarkVec[2].y);
-
-#ifdef OPENCV_DEBUG
-        warpMat.convertTo(warpMat, CV_32FC1);
-        cv::Mat alignedFace = cv::Mat::zeros(112, 112, img.type());
-        cv::warpAffine(img, alignedFace, warpMat, alignedFace.size());
-        cv::imshow("Aligned", alignedFace);
-        cv::waitKey();
-#endif
-
     }
+
     std::cout << "Total number of images processed: " << numImgProcessed << std::endl;
     std::cout << "Total number of images with faces detected: " << numFaceFound << std::endl;
     std::cout << "Average time: " << totalTime / numFaceFound << " ms" << std::endl;
