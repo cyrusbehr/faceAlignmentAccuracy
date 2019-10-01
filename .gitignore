@@ -2,4 +2,5 @@ cmake-build-debug
 .idea
 lib
 build
+json
 dlib

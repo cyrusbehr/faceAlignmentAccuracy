@@ -1,7 +1,7 @@
 //#define TF_DLIB
 //#define OPENCV_DEBUG
-//#define TF_MTCNN_CPP_ORIGINAL
-#define TF_MTCNN_CPP_NEW
+#define TF_MTCNN_CPP_ORIGINAL
+//#define TF_MTCNN_CPP_NEW
 
 #include <iostream>
 #include <experimental/filesystem>
@@ -10,6 +10,8 @@
 #include <chrono>
 #include <cmath>
 #include <fstream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include "opencv2/opencv.hpp"
 #ifdef TF_MTCNN_CPP_ORIGINAL
@@ -26,16 +28,14 @@
 #include "dlib/image_processing.h"
 #endif
 
-// Provide the system with aligned faces from MS1M dataset
-// Measure the number of faces detected using the different alignment methods
-// Record the average rotation, scale, and translation for the different alignment methods
-// Which method has the least rotation, scale, and translation?
-
+// Provide the system with images from Megaface
+// Compute the landmark locations
+// Record the difference between the compute landmark and the ground truth (from the json file).
 
 namespace fs = std::experimental::filesystem;
 typedef std::chrono::high_resolution_clock Clock;
 
-
+// Util class to write csv to file
 class FileWriter {
 public:
     explicit FileWriter(std::string fileName) {
@@ -52,6 +52,16 @@ private:
     std::ofstream m_file;
 };
 
+// Util function to compare ending of string
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+// Template function for returning largest item in vector
 template <typename T>
 T getLargest(const std::vector<T>& tVec, std::function<int(T)> getArea) {
     auto maxItr = std::max_element(tVec.begin(), tVec.end(), [getArea](const T& a, const T& b){
@@ -64,26 +74,26 @@ T getLargest(const std::vector<T>& tVec, std::function<int(T)> getArea) {
 int main() {
     // Set the reference landmark locations
 #ifdef TF_DLIB
-    FileWriter writer("DLIB_accuracy");
-    writer.write("time, angle, tx, ty, scale");
+//    FileWriter writer("DLIB_accuracy");
+//    writer.write("time, angle, tx, ty, scale");
     std::vector<cv::Point2f> coord5points = {{79.8561, 51.75}, {65.6543, 52.5136}, {30.3598, 51.9508}, {44.4134, 52.6071}, {54.8819, 79.7481}};
 #endif
 
 #ifdef TF_MTCNN_CPP_ORIGINAL
-    FileWriter writer("MTCNN_CPP_ORIGINAL_accuracy");
-    writer.write("time, angle, tx, ty, scale");
+//    FileWriter writer("MTCNN_CPP_ORIGINAL_accuracy");
+//    writer.write("time, angle, tx, ty, scale");
     std::vector<cv::Point2f> coord5points = {{38.2946, 51.6963}, {73.5318, 51.5014}, {56.0252, 71.7366}, {41.5493, 92.3655}, {70.7299, 92.2041}};
 #endif
 
 #ifdef TF_MTCNN_CPP_NEW
-    FileWriter writer("MTCNN_CPP_NEW_accuracy");
-    writer.write("time, angle, tx, ty, scale");
+//    FileWriter writer("MTCNN_CPP_NEW_accuracy");
+//    writer.write("time, angle, tx, ty, scale");
     std::vector<cv::Point2f> coord5points = {{38.2946, 51.6963}, {73.5318, 51.5014}, {56.0252, 71.7366}, {41.5493, 92.3655}, {70.7299, 92.2041}};
 #endif
 
     // Select the data we want to use
-    const std::string dataPath = "/home/nchafni/Cyrus/python/readRecFile/data"; // Aligned
-//    const std::string dataPath = "/home/nchafni/Cyrus/data/mtcnn_debug"; // Aligned
+//    const std::string dataPath = "/home/nchafni/Cyrus/python/readRecFile/data"; // Aligned
+    const std::string dataPath = "/home/nchafni/Cyrus/data/facescrub_aligned"; // Megaface
 //    const std::string dataPath = "/home/nchafni/Cyrus/data/lfw"; // Unaligned
 
     // Get all the image files in the directory
@@ -93,7 +103,12 @@ int main() {
     while (iter != end)
     {
         if (!fs::is_directory(iter->path())) {
-            listOfFiles.push_back(iter->path().string());
+            const std::string path = iter->path().string();
+            const std::string jsonSuffix = ".json";
+            // Only add image files to our list, and not the json files
+            if (!hasEnding(path, jsonSuffix)) {
+                listOfFiles.push_back(iter->path().string());
+            }
         }
         std::error_code ec;
         iter.increment(ec);
@@ -116,15 +131,16 @@ int main() {
     MTCNN mtcnn;
 #endif
 
-    // Compare for 10,000 images
-    const size_t numIts = 10000;
+    const size_t numIts = 500;
     size_t numImgProcessed = 0;
     size_t numFaceFound = 0;
     double totalTime = 0;
-    double totalAngleAbs = 0;
-    double totalTxAbs = 0;
-    double totalTyAbs = 0;
-    double totalScale = 0;
+    double totalDx1 = 0;
+    double totalDx2 = 0;
+    double totalDx3 = 0;
+    double totalDy1 = 0;
+    double totalDy2 = 0;
+    double totalDy3 = 0;
 
     const size_t upperBounds = (numIts < listOfFiles.size() ? numIts : listOfFiles.size());
     for (size_t i = 0; i < upperBounds; ++i) {
@@ -179,7 +195,7 @@ int main() {
         mtcnn.detect(ncnn_img, bboxVec);
 #endif
 
-        #if defined(TF_MTCNN_CPP_ORIGINAL) || defined(TF_MTCNN_CPP_NEW)
+#if defined(TF_MTCNN_CPP_ORIGINAL) || defined(TF_MTCNN_CPP_NEW)
         auto t2 = Clock::now();
 
         if (bboxVec.empty())
@@ -203,7 +219,6 @@ int main() {
         auto time = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
         totalTime += time;
 
-
         // Display the landmarks in debug mode
 #ifdef OPENCV_DEBUG
         for (auto & j : landmarkVec) {
@@ -213,29 +228,17 @@ int main() {
 
         cv::imshow("Original", img);
 #endif
-        // output of estimateAffinePartial2D described here:
-        // https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#gad767faff73e9cbd8b9d92b955b50062d
-        auto warpMat = cv::estimateAffinePartial2D(landmarkVec,
-                coord5points,
-                cv::noArray(),
-                cv::RANSAC,
-                100,
-                20,
-                0.90,
-                100);
+        // Compare the computed landmark locations to the provided locations
+        const std::string jsonPath = listOfFiles[i] + ".json";
+        std::ifstream jsonFile(jsonPath, std::ifstream::binary);
+        json j = json::parse(jsonFile);
 
-        const auto tx = warpMat.at<double>(0, 2);
-        const auto ty = warpMat.at<double>(1, 2);
-        const auto theta = std::atan2(-1 * warpMat.at<double>(0, 1), warpMat.at<double>(0, 0));
-        const auto scale = warpMat.at<double>(0, 0) / std::cos(theta);
-
-        totalScale += scale;
-        totalTxAbs += std::abs(tx);
-        totalTyAbs += std::abs(ty);
-        totalAngleAbs += std::abs(theta);
-
-        std::string writeStr = std::to_string(time) + "," + std::to_string(theta) + "," + std::to_string(tx) + "," + std::to_string(ty) + "," + std::to_string(scale);
-        writer.write(writeStr);
+        totalDx1 += std::abs(static_cast<double>(j["landmarks"]["0"]["x"]) - landmarkVec[1].x);
+        totalDx2 += std::abs(static_cast<double>(j["landmarks"]["1"]["x"]) - landmarkVec[0].x);
+        totalDx3 += std::abs(static_cast<double>(j["landmarks"]["2"]["x"]) - landmarkVec[2].x);
+        totalDy1 += std::abs(static_cast<double>(j["landmarks"]["0"]["y"]) - landmarkVec[1].y);
+        totalDy2 += std::abs(static_cast<double>(j["landmarks"]["1"]["y"]) - landmarkVec[0].y);
+        totalDy3 += std::abs(static_cast<double>(j["landmarks"]["2"]["y"]) - landmarkVec[2].y);
 
 #ifdef OPENCV_DEBUG
         warpMat.convertTo(warpMat, CV_32FC1);
@@ -246,12 +249,11 @@ int main() {
 #endif
 
     }
-
     std::cout << "Total number of images processed: " << numImgProcessed << std::endl;
     std::cout << "Total number of images with faces detected: " << numFaceFound << std::endl;
     std::cout << "Average time: " << totalTime / numFaceFound << " ms" << std::endl;
-    std::cout << "Average absolute angle [rads]: " << totalAngleAbs / numFaceFound << std::endl;
-    std::cout << "Average tx abs: " << totalTxAbs / numFaceFound << " Average ty abs: " << totalTyAbs / numFaceFound << std::endl;
-    std::cout << "Average scale: " << totalScale / numFaceFound << std::endl;
+    std::cout << "Right eye: " << totalDx1 / numFaceFound << ", " << totalDy1 / numFaceFound << std::endl;
+    std::cout << "Left eye: " << totalDx2 / numFaceFound << ", " << totalDy2 / numFaceFound << std::endl;
+    std::cout << "Nose: " << totalDx3 / numFaceFound << ", " << totalDy3 / numFaceFound << std::endl;
     return 0;
 }
