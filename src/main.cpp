@@ -1,7 +1,7 @@
 //#define TF_DLIB
 //#define OPENCV_DEBUG
-#define TF_MTCNN_CPP_ORIGINAL
-//#define TF_MTCNN_CPP_NEW
+//#define TF_MTCNN_CPP_ORIGINAL
+#define TF_MTCNN_CPP_NEW
 
 #include <iostream>
 #include <experimental/filesystem>
@@ -219,15 +219,6 @@ int main() {
         auto time = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
         totalTime += time;
 
-        // Display the landmarks in debug mode
-#ifdef OPENCV_DEBUG
-        for (auto & j : landmarkVec) {
-            cv::Point pt(j.x, j.y);
-            circle(img, pt, 1, cv::Scalar(0, 255, 0), 3, 3);
-        }
-
-        cv::imshow("Original", img);
-#endif
         // Compare the computed landmark locations to the provided locations
         const std::string jsonPath = listOfFiles[i] + ".json";
         std::ifstream jsonFile(jsonPath, std::ifstream::binary);
@@ -239,6 +230,24 @@ int main() {
         totalDy1 += std::abs(static_cast<double>(j["landmarks"]["0"]["y"]) - landmarkVec[1].y);
         totalDy2 += std::abs(static_cast<double>(j["landmarks"]["1"]["y"]) - landmarkVec[0].y);
         totalDy3 += std::abs(static_cast<double>(j["landmarks"]["2"]["y"]) - landmarkVec[2].y);
+
+#ifdef OPENCV_DEBUG
+        cv::Point pt(j["landmarks"]["2"]["x"], j["landmarks"]["2"]["y"]);
+        circle(img, pt, 1, cv::Scalar(0, 255, 0), 3, 3);
+        cv::Point pt1(j["landmarks"]["0"]["x"], j["landmarks"]["0"]["y"]);
+        circle(img, pt1, 1, cv::Scalar(0, 255, 0), 3, 3);
+        cv::Point pt2(j["landmarks"]["1"]["x"], j["landmarks"]["1"]["y"]);
+        circle(img, pt2, 1, cv::Scalar(0, 255, 0), 3, 3);
+
+        cv::Point pt4(landmarkVec[1].x, landmarkVec[1].y);
+        circle(img, pt4, 1, cv::Scalar(255, 0, 0), 3, 3);
+        cv::Point pt5(landmarkVec[2].x, landmarkVec[2].y);
+        circle(img, pt5, 1, cv::Scalar(255, 0, 0), 3, 3);
+        cv::Point pt6(landmarkVec[0].x, landmarkVec[0].y);
+        circle(img, pt6, 1, cv::Scalar(255, 0, 0), 3, 3);
+        cv::imshow("Megaface Landmarks", img);
+        cv::waitKey();
+#endif
     }
 
     std::cout << "Total number of images processed: " << numImgProcessed << std::endl;
