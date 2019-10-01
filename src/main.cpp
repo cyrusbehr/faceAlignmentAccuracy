@@ -1,7 +1,7 @@
 //#define TF_DLIB
-#define OPENCV_DEBUG
-#define TF_MTCNN_CPP_ORIGINAL
-//#define TF_MTCNN_CPP_NEW
+//#define OPENCV_DEBUG
+//#define TF_MTCNN_CPP_ORIGINAL
+#define TF_MTCNN_CPP_NEW
 
 #include <iostream>
 #include <experimental/filesystem>
@@ -83,6 +83,7 @@ int main() {
 
     // Select the data we want to use
     const std::string dataPath = "/home/nchafni/Cyrus/python/readRecFile/data"; // Aligned
+//    const std::string dataPath = "/home/nchafni/Cyrus/data/mtcnn_debug"; // Aligned
 //    const std::string dataPath = "/home/nchafni/Cyrus/data/lfw"; // Unaligned
 
     // Get all the image files in the directory
@@ -104,7 +105,7 @@ int main() {
     // Load the model files
 #ifdef TF_DLIB
     // Load the dlib model
-    std::string modelPath = "/home/nchafni/Cyrus/archive-projects/faceAlignmentAccuracy/models/dlib/shape_predictor_5_face_landmarks.dat";
+    std::string modelPath = "../models/dlib/shape_predictor_5_face_landmarks.dat";
     dlib::shape_predictor shapePredictor;
     dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
     dlib::deserialize(modelPath) >> shapePredictor;

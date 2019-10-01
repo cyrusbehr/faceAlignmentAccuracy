@@ -60,7 +60,7 @@ private:
 	int img_w, img_h;
 
 private:
-	const float threshold[3] = {0.04f, 0.04f, 0.04f};
+    const float threshold[3] = {0.04f, 0.04f, 0.04f};
 	int minsize = 40;
 	const float pre_facetor = 0.709f;
 };
