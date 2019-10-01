@@ -76,7 +76,7 @@ implemented as a structure based on a one SIMD register.
 - cv::v_uint32x4 and cv::v_int32x4: four 32-bit integer values (unsgined/signed) - int
 - cv::v_uint64x2 and cv::v_int64x2: two 64-bit integer values (unsigned/signed) - int64
 - cv::v_float32x4: four 32-bit floating point values (signed) - float
-- cv::v_float64x2: two 64-bit floating point valies (signed) - double
+- cv::v_float64x2: two 64-bit floating point values (signed) - double
 
 @note
 cv::v_float64x2 is not implemented in NEON variant, if you want to use this type, don't forget to
@@ -1080,7 +1080,7 @@ Example:
 v_int32x4 r; // set to {-1, -1, 1, 1}
 int mask = v_signmask(r); // mask = 3 <== 00000000 00000000 00000000 00000011
 @endcode
-For all types except 64-bit. */
+*/
 template<typename _Tp, int n> inline int v_signmask(const v_reg<_Tp, n>& a)
 {
     int mask = 0;
@@ -1109,7 +1109,7 @@ template <typename _Tp, int n> inline int v_scan_forward(const v_reg<_Tp, n>& a)
 /** @brief Check if all packed values are less than zero
 
 Unsigned values will be casted to signed: `uchar 254 => char -2`.
-For all types except 64-bit. */
+*/
 template<typename _Tp, int n> inline bool v_check_all(const v_reg<_Tp, n>& a)
 {
     for( int i = 0; i < n; i++ )
@@ -1121,7 +1121,7 @@ template<typename _Tp, int n> inline bool v_check_all(const v_reg<_Tp, n>& a)
 /** @brief Check if any of packed values is less than zero
 
 Unsigned values will be casted to signed: `uchar 254 => char -2`.
-For all types except 64-bit. */
+*/
 template<typename _Tp, int n> inline bool v_check_any(const v_reg<_Tp, n>& a)
 {
     for( int i = 0; i < n; i++ )

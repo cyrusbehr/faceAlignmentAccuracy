@@ -244,6 +244,8 @@ namespace cv { namespace debug_build_guard { } using namespace debug_build_guard
 
 #define CV_CPU_NEON             100
 
+#define CV_CPU_MSA              150
+
 #define CV_CPU_VSX              200
 #define CV_CPU_VSX3             201
 
@@ -293,6 +295,8 @@ enum CpuFeatures {
     CPU_AVX_5124FMAPS   = 27,
 
     CPU_NEON            = 100,
+
+    CPU_MSA             = 150,
 
     CPU_VSX             = 200,
     CPU_VSX3            = 201,
@@ -691,6 +695,7 @@ __CV_ENUM_FLAGS_BITWISE_XOR_EQ   (EnumType, EnumType)                           
 #endif
 
 #define CV_CXX_MOVE_SEMANTICS 1
+#define CV_CXX_MOVE(x) std::move(x)
 #define CV_CXX_STD_ARRAY 1
 #include <array>
 #ifndef CV_OVERRIDE

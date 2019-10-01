@@ -61,6 +61,7 @@ private:
 
 private:
     const float threshold[3] = {0.04f, 0.04f, 0.04f};
+//    const float threshold[3] = {0.8f, 0.8f, 0.6f};
 	int minsize = 40;
 	const float pre_facetor = 0.709f;
 };

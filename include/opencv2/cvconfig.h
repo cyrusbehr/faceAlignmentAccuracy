@@ -54,16 +54,16 @@
 /* #undef HAVE_D3D9 */
 
 /* Eigen Matrix & Linear Algebra Library */
-/* #undef HAVE_EIGEN */
+#define HAVE_EIGEN
 
 /* Geospatial Data Abstraction Library */
 /* #undef HAVE_GDAL */
 
 /* GTK+ 2.0 Thread support */
-/* #undef HAVE_GTHREAD */
+#define HAVE_GTHREAD
 
 /* GTK+ 2.x toolkit */
-/* #undef HAVE_GTK */
+#define HAVE_GTK
 
 /* Halide support */
 /* #undef HAVE_HALIDE */
@@ -72,13 +72,13 @@
 /* #undef HAVE_VULKAN */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+/* #undef HAVE_INTTYPES_H */
 
 /* Intel Integrated Performance Primitives */
-/* #undef HAVE_IPP */
-/* #undef HAVE_IPP_ICV */
-/* #undef HAVE_IPP_IW */
-/* #undef HAVE_IPP_IW_LL */
+#define HAVE_IPP
+#define HAVE_IPP_ICV
+#define HAVE_IPP_IW
+#define HAVE_IPP_IW_LL
 
 /* JPEG-2000 codec */
 #define HAVE_JASPER
@@ -87,7 +87,7 @@
 #define HAVE_JPEG
 
 /* libpng/png.h needs to be included */
-/* #undef HAVE_LIBPNG_PNG_H */
+#define HAVE_LIBPNG_PNG_H
 
 /* GDCM DICOM codec */
 /* #undef HAVE_GDCM */
@@ -107,7 +107,7 @@
 /* #undef HAVE_OPENCL_D3D11_NV */
 
 /* OpenEXR codec */
-/* #undef HAVE_OPENEXR */
+#define HAVE_OPENEXR
 
 /* OpenGL support*/
 /* #undef HAVE_OPENGL */
@@ -150,7 +150,7 @@
 /* #undef HAVE_VA_INTEL */
 
 /* Lapack */
-/* #undef HAVE_LAPACK */
+#define HAVE_LAPACK
 
 /* Library was compiled with functions instrumentation */
 /* #undef ENABLE_INSTRUMENTATION */

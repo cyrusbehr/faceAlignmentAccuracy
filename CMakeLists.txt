@@ -15,4 +15,4 @@ set(LIBNCNN ${CMAKE_CURRENT_LIST_DIR}/lib/ncnn/build_amd64/install/lib/libncnn.a
 add_executable(faceAlignmentAccuracy src/main.cpp src/mtcnn_new/mtcnn.h src/mtcnn_new/mtcnn.cpp)
 target_link_directories(faceAlignmentAccuracy PUBLIC {CMAKE_CURRENT_LIST_DIR}/lib)
 target_include_directories(faceAlignmentAccuracy PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
-target_link_libraries(faceAlignmentAccuracy PUBLIC opencv_core opencv_highgui opencv_video opencv_imgcodecs opencv_imgproc opencv_calib3d dlib ${LIBNCNN} stdc++fs)
+target_link_libraries(faceAlignmentAccuracy PUBLIC opencv_core opencv_highgui opencv_video opencv_videoio opencv_imgcodecs opencv_imgproc opencv_calib3d dlib ${LIBNCNN} stdc++fs)
